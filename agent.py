@@ -1,9 +1,10 @@
 from llama_index.readers.file import PandasCSVReader
 from llama_index.core.agent.workflow import ReActAgent
-from llama_index.llms.google_genai import GoogleGenAI
-from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
+from llama_index.llms.openai import OpenAI
+from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, Settings
 from llama_index.core import StorageContext, load_index_from_storage
+from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.tools import QueryEngineTool
 from llama_index.core.workflow import Context
 from dotenv import load_dotenv
@@ -13,11 +14,11 @@ class CIIUAgentService:
     def __init__(self):
         # Cargar variables de entorno
         load_dotenv()
-        gemini_token = os.getenv("GOOGLE_API_KEY")
+        openai_token = os.getenv("OPENAI_API_KEY")
 
         # Configurar LLM y embeddings
-        self.llm = GoogleGenAI(model="gemini-2.5-pro-exp-03-25", token=gemini_token)
-        self.embed_model = GoogleGenAIEmbedding(model="gemini-embedding-exp-03-07", token=gemini_token)
+        self.llm = OpenAI(model="gpt-4.1", token=openai_token)
+        self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
 
         Settings.llm = self.llm
         Settings.embed_model = self.embed_model
@@ -48,44 +49,51 @@ class CIIUAgentService:
         ]
 
         # Definir agente
-        self.agent = ReActAgent(
+        self.agent = FunctionAgent(
             name="ciuu",
             description="use this agent to get information from the ciuu database",
             tools=query_engine_tools,
             llm=self.llm,
             system_prompt="""
-                Eres un asistente experto en clasificación económica que ayuda a las personas a identificar el código CIIU (Clasificación Industrial Internacional Uniforme) que mejor se ajusta a la descripción de su actividad económica. Tu objetivo es analizar cuidadosamente la descripción que proporciona el usuario y encontrar el código CIIU más relevante y preciso.
+                    Eres un asistente experto en clasificación económica que ayuda a las personas a identificar los códigos CIIU (Clasificación Industrial Internacional Uniforme) que mejor se ajustan a la descripción de su actividad económica.
 
-                Tienes acceso a una base de datos con códigos CIIU, sus nombres y descripciones. Cuando recibas una descripción de trabajo, debes:
+                    Cuando el usuario proporcione una descripción de su trabajo, analiza cuidadosamente el texto para entender la actividad principal. Luego, busca y selecciona los códigos CIIU más relevantes según su similitud semántica y conceptual.
 
-                1. Comprender el propósito principal de la actividad descrita.
-                2. Buscar el código CIIU que más se asemeje en términos de sector, producto, o servicio ofrecido.
-                3. Priorizar coincidencias conceptuales y semánticas, no solo palabras clave.
-                4. En caso de dudas, elige las 3 opciones más específicas y directas que representen la actividad.
-                5. Devuelve el resultado en el siguiente formato en json:
+                    Tu respuesta debe ser un objeto JSON válido con una lista llamada "resultados", en la que cada elemento contiene dos claves: "codigo" y "descripcion".
 
-                Código CIIU: [CÓDIGO]  
-                Nombre: [NOMBRE DE LA ACTIVIDAD]  
+                    Devuelve siempre entre 1 y 3 coincidencias relevantes, ordenadas por similitud. No incluyas texto adicional, explicaciones ni comentarios fuera del JSON. Devuelve solo el JSON.
 
-                Si el usuario no proporciona suficiente información, responde solicitando una descripción más detallada de la actividad.
+                    Formato requerido:
+                    {
+                    "resultados": [
+                        {
+                        "codigo": "0112",
+                        "descripcion": "Cultivo de arroz"
+                        },
+                        {
+                        "codigo": "0113",
+                        "descripcion": "Cultivo de hortalizas, raíces y tubérculos"
+                        },
+                        {
+                        "codigo": "0111",
+                        "descripcion": "Cultivo de cereales (excepto arroz), legumbres y semillas oleaginosas"
+                        }
+                    ]
+                    }
 
-                Responde siempre en español y con un lenguaje claro y formal.
-
-                No te olvides nunca de responder en el formato dado y el código tiene que ser el número asociado al nombre de la actividad, no el nombre de la actividad solo.
-
-                Si no encuentras el código CIIU, responde con "No se encontró el código CIIU para la actividad proporcionada".
-
-                Responde con un json en el siguiente formato.
-            """
+                    Si la descripción es ambigua o insuficiente, devuelve exactamente esto:
+                    {
+                    "resultados": []
+                    }
+                    """        
         )
 
-        # Crear contexto del agente
-        self.ctx = Context(self.agent)
+        
 
     async def consultar_ciiu(self, descripcion: str) -> str:
         """
         Ejecuta una consulta al agente CIIU con la descripción proporcionada.
         """
-        handler = self.agent.run(descripcion, ctx=self.ctx)
+        handler = self.agent.run(descripcion)
         response = await handler
         return str(response)
