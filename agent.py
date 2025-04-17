@@ -12,23 +12,23 @@ import os
 
 class CIIUAgentService:
     def __init__(self):
-        # Cargar variables de entorno
+        
         load_dotenv()
         openai_token = os.getenv("OPENAI_API_KEY")
 
-        # Configurar LLM y embeddings
+        
         self.llm = OpenAI(model="gpt-4.1", token=openai_token)
         self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
 
         Settings.llm = self.llm
         Settings.embed_model = self.embed_model
 
-        # Intentar cargar el índice desde almacenamiento
+       
         try:
             storage_context = StorageContext.from_defaults(persist_dir="./storage/ciuu")
             self.ciuu_index = load_index_from_storage(storage_context)
         except Exception:
-            # Si no existe, se crea desde los datos
+            
             parser = PandasCSVReader(pandas_config={"encoding": "latin1"})
             file_extractor = {".csv": parser}
 
@@ -36,10 +36,10 @@ class CIIUAgentService:
             self.ciuu_index = VectorStoreIndex.from_documents(ciuu_docs)
             self.ciuu_index.storage_context.persist(persist_dir="./storage/ciuu")
 
-        # Crear motor de consulta
+        
         ciuu_engine = self.ciuu_index.as_query_engine(similarity_top_k=3)
 
-        # Herramientas del agente
+        
         query_engine_tools = [
             QueryEngineTool.from_defaults(
                 query_engine=ciuu_engine,
@@ -48,7 +48,7 @@ class CIIUAgentService:
             )
         ]
 
-        # Definir agente
+        
         self.agent = FunctionAgent(
             name="ciuu",
             description="use this agent to get information from the ciuu database",
