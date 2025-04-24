@@ -6,3 +6,4 @@ dotenv
 fastapi
 uvicorn
 pandas
+llama-index-llms-groq
