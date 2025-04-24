@@ -5,6 +5,7 @@ from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, Settings
 from llama_index.core import StorageContext, load_index_from_storage
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.tools import QueryEngineTool
+from llama_index.llms.groq import Groq
 from dotenv import load_dotenv
 import os
 
@@ -15,8 +16,8 @@ class CIIUAgentService:
         openai_token = os.getenv("OPENAI_API_KEY")
 
         
-        self.llm = OpenAI(model="gpt-4.1", token=openai_token)
-        self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
+        self.llm = Groq(model="gpt-4.1", token=openai_token)
+        #self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
 
         Settings.llm = self.llm
         Settings.embed_model = self.embed_model
@@ -59,7 +60,7 @@ class CIIUAgentService:
 
                     Tu respuesta debe ser un objeto JSON válido con una lista llamada "resultados", en la que cada elemento contiene dos claves: "codigo" y "descripcion".
 
-                    Devuelve siempre 3 coincidencias relevantes, ordenadas por similitud. No incluyas texto adicional, explicaciones ni comentarios fuera del JSON. Devuelve solo el JSON.
+                    Devuelve siempre 3 coincidencias relevantes, ordenadas por similitud. No incluyas texto adicional, explicaciones ni comentarios fuera del JSON. Devuelve solo el JSON sin formatos como  ```json ``` ni cosas asi.
 
                     Formato requerido:
                     {
