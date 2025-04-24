@@ -13,10 +13,10 @@ class CIIUAgentService:
     def __init__(self):
         
         load_dotenv()
-        openai_token = os.getenv("OPENAI_API_KEY")
+        groq_token = os.getenv("GROQ_API_KEY")
 
         
-        self.llm = Groq(model="gpt-4.1", token=openai_token)
+        self.llm = Groq(model="llama3-70b-8192", token=groq_token)
         #self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
 
         Settings.llm = self.llm
