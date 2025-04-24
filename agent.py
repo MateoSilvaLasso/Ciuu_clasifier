@@ -63,21 +63,19 @@ class CIIUAgentService:
 
                     Formato requerido:
                     {
-                    "resultados": [
-                        {
-                        "codigo": "0112",
-                        "descripcion": "Cultivo de arroz"
-                        },
-                        {
-                        "codigo": "0113",
-                        "descripcion": "Cultivo de hortalizas, raíces y tubérculos"
-                        },
-                        {
-                        "codigo": "0111",
-                        "descripcion": "Cultivo de cereales (excepto arroz), legumbres y semillas oleaginosas"
-                        }
-                    ]
+                    "opcion_1": {
+                    "codigo": "0112",
+                    "descripcion": "Cultivo de arroz"
+                    },
+                    "opcion_2": {
+                    "codigo": "0113",
+                    "descripcion": "Cultivo de hortalizas, raíces y tubérculos"
+                    },
+                    "opcion_3": {
+                    "codigo": "0111",
+                    "descripcion": "Cultivo de cereales (excepto arroz), legumbres y semillas oleaginosas"
                     }
+                }
 
                     Si la descripción es ambigua o insuficiente, devuelve exactamente esto:
                     {
