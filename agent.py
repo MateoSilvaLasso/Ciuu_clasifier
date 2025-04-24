@@ -20,7 +20,7 @@ class CIIUAgentService:
         #self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
 
         Settings.llm = self.llm
-        Settings.embed_model = self.embed_model
+        #Settings.embed_model = self.embed_model
 
        
         try:
