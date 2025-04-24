@@ -59,7 +59,7 @@ class CIIUAgentService:
 
                     Tu respuesta debe ser un objeto JSON válido con una lista llamada "resultados", en la que cada elemento contiene dos claves: "codigo" y "descripcion".
 
-                    Devuelve siempre entre 1 y 3 coincidencias relevantes, ordenadas por similitud. No incluyas texto adicional, explicaciones ni comentarios fuera del JSON. Devuelve solo el JSON.
+                    Devuelve siempre 3 coincidencias relevantes, ordenadas por similitud. No incluyas texto adicional, explicaciones ni comentarios fuera del JSON. Devuelve solo el JSON.
 
                     Formato requerido:
                     {
