@@ -3,6 +3,7 @@ from llama_index.llms.openai import OpenAI
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.core import SimpleDirectoryReader, VectorStoreIndex, Settings
 from llama_index.core import StorageContext, load_index_from_storage
+from llama_index.embeddings.google_genai import GoogleGenAIEmbedding
 from llama_index.core.agent.workflow import FunctionAgent
 from llama_index.core.tools import QueryEngineTool
 from llama_index.llms.groq import Groq
@@ -14,13 +15,14 @@ class CIIUAgentService:
         
         load_dotenv()
         groq_token = os.getenv("GROQ_API_KEY")
+        gemini_token = os.getenv("GOOGLE_API_KEY")
 
         
         self.llm = Groq(model="llama3-70b-8192", token=groq_token)
-        #self.embed_model = OpenAIEmbedding(model="text-embedding-3-small", token=openai_token)
+        self.embed_model = GoogleGenAIEmbedding(model="gemini-embedding-exp-03-07", token=gemini_token)
 
         Settings.llm = self.llm
-        #Settings.embed_model = self.embed_model
+        Settings.embed_model = self.embed_model
 
        
         try:
