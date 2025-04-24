@@ -2,6 +2,7 @@ llama-index
 llama-index-readers-file
 llama-index-llms-openai
 llama-index-embeddings-openai
+llama-index-embeddings-google-genai
 dotenv
 fastapi
 uvicorn
