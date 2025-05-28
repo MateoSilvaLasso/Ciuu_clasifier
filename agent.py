@@ -18,7 +18,7 @@ class CIIUAgentService:
         gemini_token = os.getenv("GOOGLE_API_KEY")
 
         
-        self.llm = Groq(model="llama3-70b-8192", token=groq_token)
+        self.llm = Groq(model="llama-3.3-70b-versatile", token=groq_token)
         self.embed_model = GoogleGenAIEmbedding(model="gemini-embedding-exp-03-07", token=gemini_token)
 
         Settings.llm = self.llm
